@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace ID3TagReader.ID3v1
+namespace ID3Tag.Core.ID3v1
 {
     public class ID3v1Reader
     {
@@ -24,9 +24,9 @@ namespace ID3TagReader.ID3v1
 
         //ID3+ Index and length of fields
 
-        public ID3v1Object Read(string fileName)
+        public ID3v1ResponseObject Read(string fileName)
         {
-            ID3v1Object ret = null;
+            ID3v1ResponseObject ret = null;
             if (!File.Exists(fileName))
                 return ret;
             using (FileStream fs = new FileStream(fileName, FileMode.Open,FileAccess.Read))
@@ -35,7 +35,7 @@ namespace ID3TagReader.ID3v1
                 string id3string = Encoding.ASCII.GetString(id3buffer);
                 if (id3string.Substring(HEADER_INDEX,HEADER_LENGTH) == "TAG")
                 {
-                    ret = new ID3v1Object()
+                    ret = new ID3v1ResponseObject()
                     {
                         Title = id3string.Substring(TITLE_INDEX, TITLE_LENGTH),
                         Artist = id3string.Substring(ARTIST_INDEX, ARTIST_LENGTH),
