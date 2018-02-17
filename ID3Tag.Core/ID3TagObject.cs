@@ -14,6 +14,7 @@
         /// </summary>
         public string Comment { get; set; }
         public int GenreID { get; set; }
+        public int TotalTracks { get; set; }
         public int Track { get; set; }
         /// <summary>
         /// ID3v1 Extendedtags only

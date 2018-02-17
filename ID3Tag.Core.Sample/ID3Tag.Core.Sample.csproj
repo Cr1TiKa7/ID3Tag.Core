@@ -57,9 +57,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Submersion.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="test.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

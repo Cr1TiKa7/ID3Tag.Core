@@ -1,5 +1,9 @@
-﻿using System;
+﻿using ID3Tag.Core.ID3v2;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace ID3Tag.Core.TagParser
 {
@@ -32,6 +36,28 @@ namespace ID3Tag.Core.TagParser
         //ExtendedHeader Fields
         private byte _TagRestrictionField;
 
+        //Frame Header MajorVersion 2
+        private const string TITLE_HEADER_V2 = "TT2";
+        private const string ARTIST_HEADER_V2 = "TP1";
+        private const string ALBUM_HEADER_V2 = "TAL";
+        private const string YEAR_HEADER_V2 = "TYE";
+        private const string TRACK_HEADER_V2 = "TRK";
+        private const string GENRE_HEADER_V2 = "TCO";
+        private const string COMMENT_HEADER_V2 = "COM";
+
+
+        //Frame Header MajorVersion 3/4
+        private const string TITLE_HEADER_V34 = "TIT2";
+        private const string ARTIST_HEADER_V34 = "TPE1";
+        private const string ALBUM_HEADER_V34 = "TALB";
+        private const string YEAR_HEADER_V34 = "TYER";
+        private const string TRACK_HEADER_V34 = "TRCK";
+        private const string GENRE_HEADER_V34 = "TCON";
+        private const string COMMENT_HEADER_V34 = "COMM";
+
+
+        private List<ID3v2Frame> _Frames = new List<ID3v2Frame>();
+        private Hashtable _FrameHashes = new Hashtable();
 
         public ID3TagObject Read(string fileName)
         {
@@ -44,11 +70,19 @@ namespace ID3Tag.Core.TagParser
             {
                 //Delcare a buffer to read
                 byte[] id3buffer = new byte[128];
-                BinaryReader binaryReader = new BinaryReader(fs);
+                using (BinaryReader binaryReader = new BinaryReader(fs))
+                {
+                    ret = new ID3TagObject();
+                    ReadHeader(binaryReader);
+                    if (_ExtendedHeaderFlag)
+                        ReadExtendedHeader(binaryReader);
 
-                ReadHeader(binaryReader);
-                
-            }
+                    ReadFrames(binaryReader);
+                    if (_FooterPresentTag)
+                        ReadFooter(binaryReader);
+                    ReadFramesByHeader(ret);
+                }
+        }
             return ret;
         }
 
@@ -153,7 +187,80 @@ namespace ID3Tag.Core.TagParser
 
         private void ReadFrames(BinaryReader binaryReader)
         {
-            //Read the frames.
+            ID3v2Frame frame;
+            do
+            {
+                frame = ID3v2Frame.ReadFrame(binaryReader, _MajorVersion);
+                if (frame.Padding)
+                {
+                    binaryReader.BaseStream.Position = Convert.ToInt64(_HeaderSize);
+                    break;
+                }
+                _Frames.Add(frame);
+                _FrameHashes.Add(frame.Name, frame);
+
+            } while (binaryReader.BaseStream.Position <= Convert.ToInt64(_HeaderSize));
+        }
+
+        private void ReadFramesByHeader(ID3TagObject id3TagObject)
+        {
+            if (_MajorVersion == 2)
+            {
+                id3TagObject.Title = GetFrameDataByHeaderName(TITLE_HEADER_V2, false);
+                id3TagObject.Artist = GetFrameDataByHeaderName(ARTIST_HEADER_V2, true);
+                id3TagObject.Album = GetFrameDataByHeaderName(ALBUM_HEADER_V2, true);
+                id3TagObject.Year = GetFrameDataByHeaderName(YEAR_HEADER_V2, true);
+                string[] tracks = GetFrameDataByHeaderName(TRACK_HEADER_V2, true).Split('/');
+                if (tracks.Length > 0 && !string.IsNullOrEmpty(tracks[0]))
+                    id3TagObject.Track = Convert.ToInt32(tracks[0]);
+                if (tracks.Length > 1 && !string.IsNullOrEmpty(tracks[1]))
+                    id3TagObject.TotalTracks = Convert.ToInt32(tracks[1]);
+                if (!string.IsNullOrEmpty(GetFrameDataByHeaderName(GENRE_HEADER_V2, true)))
+                    id3TagObject.GenreID = Convert.ToInt32(GetFrameDataByHeaderName(GENRE_HEADER_V2, true));
+                id3TagObject.Comment = GetFrameDataByHeaderName(COMMENT_HEADER_V2, true);
+            }
+            else if (_MajorVersion > 2)
+            {
+                id3TagObject.Title = GetFrameDataByHeaderName(TITLE_HEADER_V34, false);
+                id3TagObject.Artist = GetFrameDataByHeaderName(ARTIST_HEADER_V34, true);
+                id3TagObject.Album = GetFrameDataByHeaderName(ALBUM_HEADER_V34, true);
+                id3TagObject.Year = GetFrameDataByHeaderName(YEAR_HEADER_V34, true);
+                string[] tracks = GetFrameDataByHeaderName(TRACK_HEADER_V34, true).Split('/');
+               if (tracks.Length > 0 && !string.IsNullOrEmpty(tracks[0]))
+                    id3TagObject.Track = Convert.ToInt32(tracks[0]);
+                if (tracks.Length > 1 && !string.IsNullOrEmpty(tracks[1]))
+                    id3TagObject.TotalTracks = Convert.ToInt32(tracks[1]);
+                if (!string.IsNullOrEmpty(GetFrameDataByHeaderName(GENRE_HEADER_V34, true)))
+                    id3TagObject.GenreID = Convert.ToInt32(GetFrameDataByHeaderName(GENRE_HEADER_V34, true));
+                id3TagObject.Comment = GetFrameDataByHeaderName(COMMENT_HEADER_V34, true);
+            }
+        }
+
+        private void ReadFooter(BinaryReader binaryReader)
+        {
+        }
+
+        private string GetFrameDataByHeaderName(string frameKey, bool hasEncoding)
+        {
+            int i = 0;
+            if (!hasEncoding)
+                i = 1;
+            if (_FrameHashes.Contains(frameKey))
+            {
+                byte[] bytes = ((ID3v2Frame)_FrameHashes[frameKey]).FrameContent;
+                StringBuilder stringBuilder = new StringBuilder();
+                byte encoding;
+
+                for (int j = i; j < bytes.Length; j++)
+                {
+                    if (j == 0)
+                        encoding = bytes[j];
+                    else
+                        stringBuilder.Append(Convert.ToChar(bytes[i]));
+                }
+                return stringBuilder.ToString();
+            }
+            return "";
         }
     }
 }
