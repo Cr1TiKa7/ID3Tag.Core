@@ -51,15 +51,18 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="test.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\ID3Tag.Core\ID3Tag.Core.csproj">
       <Project>{6ecb84cb-c339-4654-8946-a2e8af89451d}</Project>
       <Name>ID3Tag.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Submersion.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="test.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
