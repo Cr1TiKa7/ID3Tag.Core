@@ -1,2 +1,8 @@
 language: csharp
 solution: ID3Tag.Core.sln
+install: 
+   - nuget restore src\ID3Tag.Core.sln
+script:
+   - xbuild /p:Configuration=Release src\ID3Tag.Core.sln
+   - nuget config -Set repositoryPath=""
+   - nuget pack -IncludeReferencedProjects -properties Configuration=Release
