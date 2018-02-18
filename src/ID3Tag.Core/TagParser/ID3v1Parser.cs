@@ -52,7 +52,7 @@ namespace ID3Tag.Core.TagParser
                         Album = id3string.Substring(_TitleIndex, _TitleLength),
                         Year = id3string.Substring(_YearIndex, _YearLength),
                         Comment = id3string.Substring(_CommentIndex, _CommentLength),
-                        Genre = (Genre)id3buffer[_GenreIdIndex]
+                        Genre = id3buffer[_GenreIdIndex].ToString()
                     };
                     if (id3buffer[_ZerobinaryIndex] == 0)
                     {

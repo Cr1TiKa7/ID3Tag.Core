@@ -25,7 +25,7 @@
         /// ID3v1 Tags only
         /// </summary>
         public string Comment { get; set; }
-        public Genre Genre { get; set; }
+        public string Genre { get; set; }
         public int TotalTracks { get; set; }
         public int Track { get; set; }
         /// <summary>
