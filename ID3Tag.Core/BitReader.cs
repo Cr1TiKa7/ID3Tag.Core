@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 namespace ID3Tag.Core
 {
@@ -15,34 +16,56 @@ namespace ID3Tag.Core
 
         public static bool[] GetBitArrayByByte(byte byteValue)
         {
+            BitArray bitArray = new BitArray(byteValue);
+
             bool[] ret = new bool[BIT_COUNT_IN_BYTE];
-            int byteIntValue = Convert.ToInt32(byteValue);
-            
-            for (int i = 0;i < BIT_COUNT_IN_BYTE; i++)
+            if (bitArray.Count >= 8)
             {
-                if ((byteIntValue & (1 << (BIT_COUNT_IN_BYTE -1 - i))) != 0)
-                    ret[i] = true;
+                for (int i = 0; i < BIT_COUNT_IN_BYTE; i++)
+                {
+                    ret[i] = Convert.ToBoolean(bitArray[i]);
+                }
             }
+            //int byteIntValue = Convert.ToInt32(byteValue);
+            //
+            //for (int i = 0;i < BIT_COUNT_IN_BYTE; i++)
+            //{
+            //    if ((byteIntValue & (1 << (BIT_COUNT_IN_BYTE -1 - i))) != 0)
+            //        ret[i] = true;
+            //}
 
             return ret;
         }
 
         public static bool[] GetBitArrayByBytes(byte[] byteValues)
         {
-            bool[] ret = new bool[byteValues.Length * BIT_COUNT_IN_BYTE];
-            int i = 0;
+            BitArray bitArray = new BitArray(byteValues);
 
-            foreach (byte byt in byteValues)
+            bool[] ret = new bool[byteValues.Length * BIT_COUNT_IN_BYTE];
+
+            foreach (byte by in byteValues)
             {
-                bool[] bits = GetBitArrayByByte(byt);
-                for (int j = 0; j < BIT_COUNT_IN_BYTE; j++)
+                bool[] bits = GetBitArrayByByte(by);
+                for (int i = 0; i < BIT_COUNT_IN_BYTE; i++)
                 {
-                    if (bits[j])
-                        ret[i++] = true;
-                    else
-                        ret[i++] = false;
+                    ret[i] = bits[i];
                 }
             }
+
+            //bool[] ret = new bool[byteValues.Length * BIT_COUNT_IN_BYTE];
+            //int i = 0;
+            //
+            //foreach (byte byt in byteValues)
+            //{
+            //    bool[] bits = GetBitArrayByByte(byt);
+            //    for (int j = 0; j < BIT_COUNT_IN_BYTE; j++)
+            //    {
+            //        if (bits[j])
+            //            ret[i++] = true;
+            //        else
+            //            ret[i++] = false;
+            //    }
+            //}
             
             return ret;
         }

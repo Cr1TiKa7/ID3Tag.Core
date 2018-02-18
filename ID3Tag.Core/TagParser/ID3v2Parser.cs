@@ -1,4 +1,5 @@
-﻿using ID3Tag.Core.ID3v2;
+﻿using ID3Tag.Core.Exceptions;
+using ID3Tag.Core.ID3v2;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -68,24 +69,82 @@ namespace ID3Tag.Core.TagParser
 
             using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
             {
-                //Delcare a buffer to read
-                byte[] id3buffer = new byte[128];
                 using (BinaryReader binaryReader = new BinaryReader(fs))
                 {
                     ret = new ID3TagObject();
                     ReadHeader(binaryReader);
+
                     if (_ExtendedHeaderFlag)
                         ReadExtendedHeader(binaryReader);
 
                     ReadFrames(binaryReader);
+
                     if (_FooterPresentTag)
                         ReadFooter(binaryReader);
+
                     ReadFramesByHeader(ret);
                 }
         }
             return ret;
         }
 
+        private void ReadFooter(BinaryReader binaryReader)
+        {
+            string id3v2FooterTag = new string(binaryReader.ReadChars(_TagLength));
+
+            //If a footer exists the tag is 3DI instead of ID3
+            if (id3v2FooterTag == "3DI")
+            {
+                //Read the version number of id3v2
+                _MajorVersion = Convert.ToInt32(binaryReader.ReadByte());
+                _MinorVersion = Convert.ToInt32(binaryReader.ReadByte());
+
+                if (_MajorVersion <= 4)
+                {
+                    bool[] flagByte = BitReader.GetBitArrayByByte(binaryReader.ReadByte());
+                    switch (_MajorVersion)
+                    {
+                        case 2:
+                            {
+                                _UnsynchronisationFlag = flagByte[0];
+                                _ExtendedHeaderFlag = flagByte[1];
+                                break;
+                            }
+                        case 3:
+                            {
+                                _UnsynchronisationFlag = flagByte[0];
+                                _ExtendedHeaderFlag = flagByte[1];
+                                _ExperimentalIndicatorFlag = flagByte[2];
+                                break;
+                            }
+                        case 4:
+                            {
+                                _UnsynchronisationFlag = flagByte[0];
+                                _ExtendedHeaderFlag = flagByte[1];
+                                _ExperimentalIndicatorFlag = flagByte[2];
+                                _FooterPresentTag = flagByte[3];
+                                break;
+                            }
+                    }
+
+                    char[] tagSize = binaryReader.ReadChars(4);
+                    int[] bytes = new int[4];
+                    ulong newSize = 0;
+
+                    bytes[3] = tagSize[3] | ((tagSize[2] & 1) << 7);
+                    bytes[2] = ((tagSize[2] >> 1) & 63) | ((tagSize[1] & 3) << 6);
+                    bytes[1] = ((tagSize[1] >> 2) & 31) | ((tagSize[0] & 7) << 5);
+                    bytes[0] = ((tagSize[0] >> 3) & 15);
+
+                    newSize = ((UInt64)10 + (UInt64)bytes[3] |
+                        ((UInt64)bytes[2] << 8) |
+                        ((UInt64)bytes[1] << 16) |
+                        ((UInt64)bytes[0] << 24));
+
+                    _HeaderSize = newSize;
+                }
+            }
+        }
         private void ReadHeader(BinaryReader binaryReader)
         {
             string id3v2tag = new string(binaryReader.ReadChars(_TagLength));
@@ -102,11 +161,26 @@ namespace ID3Tag.Core.TagParser
                 _UnsynchronisationFlag = flagByte[0];
                 _ExtendedHeaderFlag = flagByte[1];
                 _ExperimentalIndicatorFlag = flagByte[2];
-                _FooterPresentTag = flagByte[3];
+
+                char[] tagSize = binaryReader.ReadChars(4);  
+                int[] bytes = new int[4]; 
+                ulong newSize = 0;
+
+                bytes[3] = tagSize[3] | ((tagSize[2] & 1) << 7);
+                bytes[2] = ((tagSize[2] >> 1) & 63) | ((tagSize[1] & 3) << 6);
+                bytes[1] = ((tagSize[1] >> 2) & 31) | ((tagSize[0] & 7) << 5);
+                bytes[0] = ((tagSize[0] >> 3) & 15);
+
+                newSize = ((UInt64)10 + (UInt64)bytes[3] |
+                    ((UInt64)bytes[2] << 8) |
+                    ((UInt64)bytes[1] << 16) |
+                    ((UInt64)bytes[0] << 24));
+
+                _HeaderSize = newSize;
             }
             else
             {
-                //TODO: Throw exception that the ID3 Tag couldn't been found.
+                throw new ID3TagCouldntBeenFoundException("The ID3v2 Tag couldn't been found. Please make sure the file has an ID3v2 Tag");
             }
         }
 
@@ -174,7 +248,7 @@ namespace ID3Tag.Core.TagParser
                 }
                 else
                 {
-                    //TODO: Throw corrupted header exception
+                    throw new ID3v2HeaderCorruptedException("The Header of the file is corrupted. Please try another file.");
                 }
             }
             if (_TagRestrictionFlag)
@@ -236,9 +310,6 @@ namespace ID3Tag.Core.TagParser
             }
         }
 
-        private void ReadFooter(BinaryReader binaryReader)
-        {
-        }
 
         private string GetFrameDataByHeaderName(string frameKey, bool hasEncoding)
         {

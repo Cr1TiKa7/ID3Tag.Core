@@ -65,8 +65,7 @@ namespace ID3Tag.Core.ID3v2
         /// False = Frame is not enlargres. True = Frame is enlarged.
         /// </summary>
         public bool Padding { get; set; }
-
-        //TODO: Add a method to read the frame.
+        
 
         public static ID3v2Frame ReadFrame(BinaryReader binaryReader, int version)
         {

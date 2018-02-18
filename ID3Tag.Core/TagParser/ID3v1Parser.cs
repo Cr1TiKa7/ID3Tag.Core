@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ID3Tag.Core.Exceptions;
+using System;
 using System.IO;
 using System.Text;
 
@@ -60,7 +61,7 @@ namespace ID3Tag.Core.TagParser
                 }
                 else
                 {
-                    //TODO: Throw exception that the ID3 Tag couldn't been found.
+                    throw new ID3TagCouldntBeenFoundException("The ID3v1 Tag couldn't been found. Please make sure the file has an ID3v1 Tag");
                 }
             }
             return ret;
