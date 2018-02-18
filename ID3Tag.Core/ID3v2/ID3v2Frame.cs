@@ -74,14 +74,14 @@ namespace ID3Tag.Core.ID3v2
             //Verion 3 and 4 of the namesize is always 4.
             int nameSize = 4;
 
-            if (version == 3)
+            if (version == 2)
                 nameSize = 3;
 
             ret.Name = new string(binaryReader.ReadChars(nameSize));
             ret.MajorVersion = version;
 
             StringBuilder stringBuilder = new StringBuilder(0, nameSize);
-            for (int i = 0; i < version; i++)
+            for (int i = 0; i < nameSize; i++)
             {
                 stringBuilder.Append(Convert.ToChar(0));
             }

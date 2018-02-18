@@ -45,8 +45,7 @@ namespace ID3Tag.Core.TagParser
         private const string TRACK_HEADER_V2 = "TRK";
         private const string GENRE_HEADER_V2 = "TCO";
         private const string COMMENT_HEADER_V2 = "COM";
-
-
+        
         //Frame Header MajorVersion 3/4
         private const string TITLE_HEADER_V34 = "TIT2";
         private const string ARTIST_HEADER_V34 = "TPE1";
@@ -55,11 +54,16 @@ namespace ID3Tag.Core.TagParser
         private const string TRACK_HEADER_V34 = "TRCK";
         private const string GENRE_HEADER_V34 = "TCON";
         private const string COMMENT_HEADER_V34 = "COMM";
-
-
+        
+        //List of Frames and FrameHashes that were found
         private List<ID3v2Frame> _Frames = new List<ID3v2Frame>();
         private Hashtable _FrameHashes = new Hashtable();
 
+        /// <summary>
+        /// Reads in the given file at the filepath and returns an object to get all the ID3 Content.
+        /// </summary>
+        /// <param name="fileName">Filepath of the file to parse</param>
+        /// <returns>Returns an ID3TagObject to work with.</returns>
         public ID3TagObject Read(string fileName)
         {
             ID3TagObject ret = null;
@@ -145,6 +149,7 @@ namespace ID3Tag.Core.TagParser
                 }
             }
         }
+
         private void ReadHeader(BinaryReader binaryReader)
         {
             string id3v2tag = new string(binaryReader.ReadChars(_TagLength));
@@ -281,41 +286,42 @@ namespace ID3Tag.Core.TagParser
             if (_MajorVersion == 2)
             {
                 id3TagObject.Title = GetFrameDataByHeaderName(TITLE_HEADER_V2, false);
-                id3TagObject.Artist = GetFrameDataByHeaderName(ARTIST_HEADER_V2, true);
-                id3TagObject.Album = GetFrameDataByHeaderName(ALBUM_HEADER_V2, true);
-                id3TagObject.Year = GetFrameDataByHeaderName(YEAR_HEADER_V2, true);
-                string[] tracks = GetFrameDataByHeaderName(TRACK_HEADER_V2, true).Split('/');
+                id3TagObject.Artist = GetFrameDataByHeaderName(ARTIST_HEADER_V2, false);
+                id3TagObject.Album = GetFrameDataByHeaderName(ALBUM_HEADER_V2, false);
+                id3TagObject.Year = GetFrameDataByHeaderName(YEAR_HEADER_V2, false);
+                string[] tracks = GetFrameDataByHeaderName(TRACK_HEADER_V2, false).Split('/');
                 if (tracks.Length > 0 && !string.IsNullOrEmpty(tracks[0]))
                     id3TagObject.Track = Convert.ToInt32(tracks[0]);
                 if (tracks.Length > 1 && !string.IsNullOrEmpty(tracks[1]))
                     id3TagObject.TotalTracks = Convert.ToInt32(tracks[1]);
-                if (!string.IsNullOrEmpty(GetFrameDataByHeaderName(GENRE_HEADER_V2, true)))
-                    id3TagObject.GenreID = Convert.ToInt32(GetFrameDataByHeaderName(GENRE_HEADER_V2, true));
-                id3TagObject.Comment = GetFrameDataByHeaderName(COMMENT_HEADER_V2, true);
+                if (!string.IsNullOrEmpty(GetFrameDataByHeaderName(GENRE_HEADER_V2, false)))
+                    id3TagObject.GenreID = Convert.ToInt32(GetFrameDataByHeaderName(GENRE_HEADER_V2, false));
+                id3TagObject.Comment = GetFrameDataByHeaderName(COMMENT_HEADER_V2, false);
             }
             else if (_MajorVersion > 2)
             {
                 id3TagObject.Title = GetFrameDataByHeaderName(TITLE_HEADER_V34, false);
-                id3TagObject.Artist = GetFrameDataByHeaderName(ARTIST_HEADER_V34, true);
-                id3TagObject.Album = GetFrameDataByHeaderName(ALBUM_HEADER_V34, true);
-                id3TagObject.Year = GetFrameDataByHeaderName(YEAR_HEADER_V34, true);
-                string[] tracks = GetFrameDataByHeaderName(TRACK_HEADER_V34, true).Split('/');
+                id3TagObject.Artist = GetFrameDataByHeaderName(ARTIST_HEADER_V34, false);
+                id3TagObject.Album = GetFrameDataByHeaderName(ALBUM_HEADER_V34, false);
+                id3TagObject.Year = GetFrameDataByHeaderName(YEAR_HEADER_V34, false);
+                string[] tracks = GetFrameDataByHeaderName(TRACK_HEADER_V34, false).Split('/');
                if (tracks.Length > 0 && !string.IsNullOrEmpty(tracks[0]))
                     id3TagObject.Track = Convert.ToInt32(tracks[0]);
                 if (tracks.Length > 1 && !string.IsNullOrEmpty(tracks[1]))
                     id3TagObject.TotalTracks = Convert.ToInt32(tracks[1]);
-                if (!string.IsNullOrEmpty(GetFrameDataByHeaderName(GENRE_HEADER_V34, true)))
-                    id3TagObject.GenreID = Convert.ToInt32(GetFrameDataByHeaderName(GENRE_HEADER_V34, true));
-                id3TagObject.Comment = GetFrameDataByHeaderName(COMMENT_HEADER_V34, true);
+                if (!string.IsNullOrEmpty(GetFrameDataByHeaderName(GENRE_HEADER_V34, false)))
+                    id3TagObject.GenreID = Convert.ToInt32(GetFrameDataByHeaderName(GENRE_HEADER_V34, false));
+                id3TagObject.Comment = GetFrameDataByHeaderName(COMMENT_HEADER_V34, false);
             }
         }
-
-
-        private string GetFrameDataByHeaderName(string frameKey, bool hasEncoding)
+        
+        private string GetFrameDataByHeaderName(string frameKey, bool useEncoding)
         {
             int i = 0;
-            if (!hasEncoding)
-                i = 1;
+            Encoding charEncoding = Encoding.Unicode;
+            if (!useEncoding)
+                i = 3;
+                
             if (_FrameHashes.Contains(frameKey))
             {
                 byte[] bytes = ((ID3v2Frame)_FrameHashes[frameKey]).FrameContent;
@@ -324,12 +330,17 @@ namespace ID3Tag.Core.TagParser
 
                 for (int j = i; j < bytes.Length; j++)
                 {
+                    //If byte value is 0 skip it else you get string like 'T E S T ' instea of 'TEST'
+                    if (bytes[j] == 0)
+                        continue;
+
                     if (j == 0)
                         encoding = bytes[j];
                     else
-                        stringBuilder.Append(Convert.ToChar(bytes[i]));
+                        stringBuilder.Append(Convert.ToChar(bytes[j]));
                 }
-                return stringBuilder.ToString();
+               return stringBuilder.ToString();
+                //return stringBuilder.ToString();
             }
             return "";
         }

@@ -5,10 +5,16 @@ namespace ID3TagReader_Sample
     {
         static void Main(string[] args)
         {
+            //ID3Tag.Core.TagParser.ID3v1Parser reader = new ID3Tag.Core.TagParser.ID3v1Parser();
             ID3Tag.Core.TagParser.ID3v2Parser reader = new ID3Tag.Core.TagParser.ID3v2Parser();
             ID3Tag.Core.ID3TagObject resp = reader.Read("test.mp3");
             if (resp != null)
-                Console.WriteLine(resp.Artist);
+            {
+                Console.WriteLine("Album title: " + resp.Album);
+                Console.WriteLine("Comment: " + resp.Comment);
+                Console.WriteLine("Artist: " + resp.Artist);
+                Console.WriteLine("Title: " + resp.Title);
+            }
             Console.ReadLine();
         }
     }
