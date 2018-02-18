@@ -4,6 +4,8 @@ The ID3Tag.Core is a library to read ID3v1 and ID3v2 Tags from .mp3 files.
 This library supports .Net 4.0, 4.5, 4.6 and .NetStandard 2.0.
 
 # Current Status
+Linux build: [![Build Status](https://travis-ci.org/Cr1TiKa7/ID3Tag.Core.svg?branch=master)](https://travis-ci.org/Cr1TiKa7/ID3Tag.Core) Windows build:
+
 The Library is ready to build but still needs improvements(i am currently working on).
 Also not every Frame is implemented. Will add them in the next update.
 
