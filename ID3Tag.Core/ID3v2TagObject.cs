@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ID3Tag.Core
 {
-    public class ID3v2TagObject
+    internal class ID3v2TagObject
     {
         public int MajorVersion { get; set; }
         public int MinorVersion { get; set; }

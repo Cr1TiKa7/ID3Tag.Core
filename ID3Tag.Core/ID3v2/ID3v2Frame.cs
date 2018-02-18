@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ID3Tag.Core.ID3v2
 {
-    public class ID3v2Frame
+    internal class ID3v2Frame
     {
         /// <summary>
         /// Name of the frame

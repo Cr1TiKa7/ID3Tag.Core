@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace ID3Tag.Core
 {
-    public static class BitReader
+    internal static class BitReader
     {
         private const int BIT_COUNT_IN_BYTE = 8;
         public static bool GetBitAtPosition(byte byteValue, int position)

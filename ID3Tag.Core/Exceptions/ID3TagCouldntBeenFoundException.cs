@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ID3Tag.Core.Exceptions
 {
-    public class ID3TagCouldntBeenFoundException : Exception
+    internal class ID3TagCouldntBeenFoundException : Exception
     {
         public ID3TagCouldntBeenFoundException(string msg) : base(msg)
         {
