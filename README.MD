@@ -1,10 +1,10 @@
 # ID3Tag.Core 
 
 The ID3Tag.Core is a library to read ID3v1 and ID3v2 Tags from .mp3 files.
-This library supports .Net 4.0 - 4.6 and .NetStandard 2.0.
+This library supports .Net 4.0, 4.5, 4.6 and .NetStandard 2.0.
 
 # Current Status
-The Library is read to build but still needs improvments and bug fixes (i am currently working on).
+The Library is ready to build but still needs improvements and bug fixes (i am currently working on).
 
 # Usage
 ```sh
