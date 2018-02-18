@@ -3,6 +3,18 @@
     public class ID3TagObject
     {
         public string Title { get; set; }
+        /// <summary>
+        /// Only ID3v2
+        /// </summary>
+        public string BeatsPerMinute { get; set; }
+        /// <summary>
+        /// Only ID3v2
+        /// </summary>
+        public string Copyright { get; set; }
+        /// <summary>
+        /// Only ID3v2
+        /// </summary>
+        public string Length { get; set; }
         public string Artist { get; set; }
         public string Album { get; set; }
         /// <summary>
@@ -13,7 +25,7 @@
         /// ID3v1 Tags only
         /// </summary>
         public string Comment { get; set; }
-        public int GenreID { get; set; }
+        public Genre Genre { get; set; }
         public int TotalTracks { get; set; }
         public int Track { get; set; }
         /// <summary>

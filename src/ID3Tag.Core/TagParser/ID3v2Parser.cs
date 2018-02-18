@@ -37,6 +37,7 @@ namespace ID3Tag.Core.TagParser
         //ExtendedHeader Fields
         private byte _TagRestrictionField;
 
+        #region "Frame headers"
         //Frame Header MajorVersion 2
         private const string TITLE_HEADER_V2 = "TT2";
         private const string ARTIST_HEADER_V2 = "TP1";
@@ -45,16 +46,24 @@ namespace ID3Tag.Core.TagParser
         private const string TRACK_HEADER_V2 = "TRK";
         private const string GENRE_HEADER_V2 = "TCO";
         private const string COMMENT_HEADER_V2 = "COM";
-        
+
         //Frame Header MajorVersion 3/4
-        private const string TITLE_HEADER_V34 = "TIT2";
-        private const string ARTIST_HEADER_V34 = "TPE1";
-        private const string ALBUM_HEADER_V34 = "TALB";
-        private const string YEAR_HEADER_V34 = "TYER";
-        private const string TRACK_HEADER_V34 = "TRCK";
-        private const string GENRE_HEADER_V34 = "TCON";
+        //URL to all frame headers: http://id3.org/id3v2.4.0-frames
+
         private const string COMMENT_HEADER_V34 = "COMM";
-        
+
+        private const string ALBUM_HEADER_V34 = "TALB";
+        private const string BPM_HEADER_V34 = "TBPM";
+        private const string GENRE_HEADER_V34 = "TCON";
+        private const string COPYRIGHT_HEADER_V34 = "TCOP";
+        private const string TITLE_HEADER_V34 = "TIT2";
+        private const string LENGTH_HEADER_V34 = "TLEN";
+        private const string ARTIST_HEADER_V34 = "TPE1";
+        private const string TRACK_HEADER_V34 = "TRCK";
+        private const string YEAR_HEADER_V34 = "TYER";
+
+        #endregion
+
         //List of Frames and FrameHashes that were found
         private List<ID3v2Frame> _Frames = new List<ID3v2Frame>();
         private Hashtable _FrameHashes = new Hashtable();
@@ -295,11 +304,16 @@ namespace ID3Tag.Core.TagParser
                 if (tracks.Length > 1 && !string.IsNullOrEmpty(tracks[1]))
                     id3TagObject.TotalTracks = Convert.ToInt32(tracks[1]);
                 if (!string.IsNullOrEmpty(GetFrameDataByHeaderName(GENRE_HEADER_V2, false)))
-                    id3TagObject.GenreID = Convert.ToInt32(GetFrameDataByHeaderName(GENRE_HEADER_V2, false));
+                    id3TagObject.Genre = (Genre)Convert.ToInt32(GetFrameDataByHeaderName(GENRE_HEADER_V2, false));
                 id3TagObject.Comment = GetFrameDataByHeaderName(COMMENT_HEADER_V2, false);
             }
             else if (_MajorVersion > 2)
             {
+
+                id3TagObject.BeatsPerMinute = GetFrameDataByHeaderName(BPM_HEADER_V34, false);
+                id3TagObject.Length = GetFrameDataByHeaderName(LENGTH_HEADER_V34, false);
+                id3TagObject.Copyright = GetFrameDataByHeaderName(COPYRIGHT_HEADER_V34, false);
+
                 id3TagObject.Title = GetFrameDataByHeaderName(TITLE_HEADER_V34, false);
                 id3TagObject.Artist = GetFrameDataByHeaderName(ARTIST_HEADER_V34, false);
                 id3TagObject.Album = GetFrameDataByHeaderName(ALBUM_HEADER_V34, false);
@@ -310,11 +324,22 @@ namespace ID3Tag.Core.TagParser
                 if (tracks.Length > 1 && !string.IsNullOrEmpty(tracks[1]))
                     id3TagObject.TotalTracks = Convert.ToInt32(tracks[1]);
                 if (!string.IsNullOrEmpty(GetFrameDataByHeaderName(GENRE_HEADER_V34, false)))
-                    id3TagObject.GenreID = Convert.ToInt32(GetFrameDataByHeaderName(GENRE_HEADER_V34, false));
+                    id3TagObject.Genre = (Genre)Convert.ToInt32(GetFrameDataByHeaderName(GENRE_HEADER_V34, false));
                 id3TagObject.Comment = GetFrameDataByHeaderName(COMMENT_HEADER_V34, false);
             }
         }
-        
+
+        /// <summary>
+        /// Allows you to get the content of a frame by yourself
+        /// </summary>
+        /// <param name="frameKey">Framekeys: http://id3.org/id3v2.4.0-frames </param>
+        /// <param name="useEncoding">If the framekey has an encoding set this value to true. Default value is false</param>
+        /// <returns></returns>
+        public string GetFrameValue(string frameKey, bool useEncoding = false)
+        {
+            return GetFrameDataByHeaderName(frameKey, useEncoding);
+        }
+
         private string GetFrameDataByHeaderName(string frameKey, bool useEncoding)
         {
             int i = 0;
