@@ -1,6 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net40;net45;net46;netstandard2.0</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.1.0</Version>
+    <Authors>Cr1TiKa7</Authors>
+    <Company />
+    <Description>The ID3Tag.Core is a library to read ID3v1 and ID3v2 Tags from .mp3 files. This library supports .Net 4.0, 4.5, 4.6 and .NetStandard 2.0.</Description>
+    <Copyright>© Cr1TiKa7 2018</Copyright>
+    <PackageLicenseUrl>https://opensource.org/licenses/GPL-3.0</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Cr1TiKa7/ID3Tag.Core</PackageProjectUrl>
+    <PackageIconUrl>https://www.codeproject.com/KB/Blogs/1214420/nuget-package-logo.png</PackageIconUrl>
+    <RepositoryUrl></RepositoryUrl>
+    <PackageTags>mp3 id3 tag artist informations extended</PackageTags>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

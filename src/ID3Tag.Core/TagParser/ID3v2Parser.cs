@@ -304,7 +304,7 @@ namespace ID3Tag.Core.TagParser
                 if (tracks.Length > 1 && !string.IsNullOrEmpty(tracks[1]))
                     id3TagObject.TotalTracks = Convert.ToInt32(tracks[1]);
                 if (!string.IsNullOrEmpty(GetFrameDataByHeaderName(GENRE_HEADER_V2, false)))
-                    id3TagObject.Genre = (Genre)Convert.ToInt32(GetFrameDataByHeaderName(GENRE_HEADER_V2, false));
+                    id3TagObject.Genre = GetFrameDataByHeaderName(GENRE_HEADER_V2, false);
                 id3TagObject.Comment = GetFrameDataByHeaderName(COMMENT_HEADER_V2, false);
             }
             else if (_MajorVersion > 2)
