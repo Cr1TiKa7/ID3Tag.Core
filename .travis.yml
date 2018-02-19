@@ -6,3 +6,7 @@ install:
    - dotnet restore
    - dotnet build -c Release -f netstandard2.0
    - cd ..
+addons:
+   artifacts: true
+      paths:
+      - src/ID3Tag.Core/bin/Release/*
