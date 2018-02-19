@@ -1,5 +1,6 @@
 language: csharp
 solution: ID3Tag.Core.sln
+dotnet: 2.1.4
 install:
    - dotnet restore
    - dotnet build
