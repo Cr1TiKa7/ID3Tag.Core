@@ -1,5 +1,4 @@
 language: csharp
 solution: ID3Tag.Core.sln
-install: 
-   - sudo apt-get install -y gtk-sharp2
+install:
    - nuget restore ID3Tag.Core.sln
