@@ -1,8 +1,21 @@
 language: csharp
 solution: ID3Tag.Core.sln
 dotnet: 2.0.0
+before_script: 
+   - composer config github-oauth.github.com ${GH_TOKEN}
 install:
    - cd src/ID3Tag.Core
    - dotnet restore
    - dotnet build -c Release -f netstandard2.0
    - cd ..
+after_success:
+   - cd ID3Tag.Core/bin
+   - sudo apt-get install zip gzip tar
+   - zip -r id3tag.core.zip Release
+deploy:
+  provider: releases
+  api_key: ${GH_TOKEN}
+  file: "FILE TO UPLOAD"
+  skip_cleanup: true
+  on:
+    tags: true
