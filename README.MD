@@ -10,8 +10,9 @@ The Library is ready to build but still needs improvements(i am currently workin
 Also not every Frame is implemented. Will add them in the next update.
 
 # Usage
+To simply retrieve informations from you .mp3 file you can use this library as shown below:
 ```sh
- ID3Tag.Core.TagParser.ID3v1Parser reader = new ID3Tag.Core.TagParser.ID3v1Parser();
+ID3Tag.Core.TagParser.ID3v1Parser reader = new ID3Tag.Core.TagParser.ID3v1Parser();
 //ID3Tag.Core.TagParser.ID3v2Parser reader = new ID3Tag.Core.TagParser.ID3v2Parser();
 ID3Tag.Core.ID3TagObject resp = reader.Read("test.mp3");
 if (resp != null)
@@ -20,3 +21,14 @@ if (resp != null)
     Console.WriteLine(resp.Album);
     Console.WriteLine(resp.Comment);
 }
+
+If you want to read not implemented frames (e.g. the attached picture) you can call the following method:
+```sh
+ID3Tag.Core.TagParser.ID3v2Parser reader = new ID3Tag.Core.TagParser.ID3v2Parser();
+ID3Tag.Core.ID3TagObject resp = reader.Read("test.mp3");
+if (resp != null)
+{
+    Console.WriteLine("Test: " + reader.GetFrameValue("APIC"));
+}
+```
+It's important to first call the 'Read' method on the 'ID3v2Parser'! I will change that in the future.
