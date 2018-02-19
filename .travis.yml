@@ -5,4 +5,4 @@ install:
    - cd src/ID3Tag.Core
    - dotnet restore
    - dotnet build -c Release -f netstandard2.0
-   - cd ..\
+   - cd ..
