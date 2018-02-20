@@ -29,7 +29,6 @@ ID3Tag.Core.TagParser.ID3v2Parser reader = new ID3Tag.Core.TagParser.ID3v2Parser
 ID3Tag.Core.ID3TagObject resp = reader.Read("test.mp3");
 if (resp != null)
 {
-    Console.WriteLine("Test: " + reader.GetFrameValue("APIC"));
+    Console.WriteLine("Test: " + resp.GetFrameValue("APIC"));
 }
 ```
-It's important to first call the 'Read' method on the 'ID3v2Parser'! I will change that in the future.
