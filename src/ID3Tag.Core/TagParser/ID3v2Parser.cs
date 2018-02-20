@@ -55,8 +55,11 @@ namespace ID3Tag.Core.TagParser
         private const string ALBUM_HEADER_V34 = "TALB";
         private const string BPM_HEADER_V34 = "TBPM";
         private const string GENRE_HEADER_V34 = "TCON";
+        private const string COMPOSER_HEADER_V34 = "TCON";
         private const string COPYRIGHT_HEADER_V34 = "TCOP";
+        private const string TEXTWRITER_HEADER_V34 = "TEXT";
         private const string TITLE_HEADER_V34 = "TIT2";
+        private const string LANGUAGE_HEADER_V34 = "TLAN";
         private const string LENGTH_HEADER_V34 = "TLEN";
         private const string ARTIST_HEADER_V34 = "TPE1";
         private const string TRACK_HEADER_V34 = "TRCK";
@@ -84,7 +87,11 @@ namespace ID3Tag.Core.TagParser
             {
                 using (BinaryReader binaryReader = new BinaryReader(fs))
                 {
-                    ret = new ID3TagObject();
+                    ret = new ID3TagObject()
+                    {
+                         ID3v2Parser = this,
+                         Type = ID3Type.ID3v2
+                    };
                     ReadHeader(binaryReader);
 
                     if (_ExtendedHeaderFlag)
@@ -312,20 +319,24 @@ namespace ID3Tag.Core.TagParser
 
                 id3TagObject.BeatsPerMinute = GetFrameDataByHeaderName(BPM_HEADER_V34, false);
                 id3TagObject.Length = GetFrameDataByHeaderName(LENGTH_HEADER_V34, false);
-                id3TagObject.Copyright = GetFrameDataByHeaderName(COPYRIGHT_HEADER_V34, false);
 
-                id3TagObject.Title = GetFrameDataByHeaderName(TITLE_HEADER_V34, false);
                 id3TagObject.Artist = GetFrameDataByHeaderName(ARTIST_HEADER_V34, false);
                 id3TagObject.Album = GetFrameDataByHeaderName(ALBUM_HEADER_V34, false);
+                id3TagObject.Comment = GetFrameDataByHeaderName(COMMENT_HEADER_V34, false);
+                id3TagObject.Composer = GetFrameDataByHeaderName(COMPOSER_HEADER_V34, false);
+                id3TagObject.Copyright = GetFrameDataByHeaderName(COPYRIGHT_HEADER_V34, false);
+                id3TagObject.Language = GetFrameDataByHeaderName(LANGUAGE_HEADER_V34, false);
+                id3TagObject.Textwriter = GetFrameDataByHeaderName(TEXTWRITER_HEADER_V34, false);
+                id3TagObject.Title = GetFrameDataByHeaderName(TITLE_HEADER_V34, false);
                 id3TagObject.Year = GetFrameDataByHeaderName(YEAR_HEADER_V34, false);
-                string[] tracks = GetFrameDataByHeaderName(TRACK_HEADER_V34, false).Split('/');
+
+                string[] tracks = GetFrameDataByHeaderName(TRACK_HEADER_V34, true).Split('/');
                if (tracks.Length > 0 && !string.IsNullOrEmpty(tracks[0]))
                     id3TagObject.Track = Convert.ToInt32(tracks[0]);
                 if (tracks.Length > 1 && !string.IsNullOrEmpty(tracks[1]))
                     id3TagObject.TotalTracks = Convert.ToInt32(tracks[1]);
                 if (!string.IsNullOrEmpty(GetFrameDataByHeaderName(GENRE_HEADER_V34, false)))
                     id3TagObject.Genre = GetFrameDataByHeaderName(GENRE_HEADER_V34, false);
-                id3TagObject.Comment = GetFrameDataByHeaderName(COMMENT_HEADER_V34, false);
             }
         }
 
@@ -335,12 +346,8 @@ namespace ID3Tag.Core.TagParser
         /// <param name="frameKey">Framekeys: http://id3.org/id3v2.4.0-frames </param>
         /// <param name="useEncoding">If the framekey has an encoding set this value to true. Default value is false</param>
         /// <returns></returns>
-        public string GetFrameValue(string frameKey, bool useEncoding = false)
-        {
-            return GetFrameDataByHeaderName(frameKey, useEncoding);
-        }
 
-        private string GetFrameDataByHeaderName(string frameKey, bool useEncoding)
+        internal string GetFrameDataByHeaderName(string frameKey, bool useEncoding)
         {
             int i = 0;
             Encoding charEncoding = Encoding.Unicode;

@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Drawing;
+using System.IO;
+using System.Text;
+
 namespace ID3TagReader_Sample
 {
     class Program
@@ -11,10 +15,14 @@ namespace ID3TagReader_Sample
             if (resp != null)
             {
                 Console.WriteLine("Album title: " + resp.Album);
-                Console.WriteLine("Comment: " + resp.Comment);
                 Console.WriteLine("Artist: " + resp.Artist);
+                Console.WriteLine("Comment: " + resp.Comment);
+                Console.WriteLine("Composer: " + resp.Composer);
+                Console.WriteLine("Copyright: " + resp.Copyright);
                 Console.WriteLine("Title: " + resp.Title);
+                Console.WriteLine("Tracknumber: " + resp.Track);
             }
+
             Console.ReadLine();
         }
     }
